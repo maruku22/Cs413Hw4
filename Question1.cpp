@@ -1,13 +1,17 @@
 // Question 1:
-#include <bits/stdc++.h>
-using namespace std;
+#include <iostream>
+#include <fstream>
+#include <string>
+#include <stdexcept>
+#include <cctype>
 
 struct Queue10 {
-    static constexpr int CAP = 10;
-    int data[CAP]{};
+    static const int CAP = 10;
+    int data[CAP] = {0};
     int head = 0;  // front index
     int tail = 0;  // next insert index
     int size = 0;  // current count
+
     bool empty() const { return size == 0; }
     bool full()  const { return size == CAP; }
 
@@ -25,12 +29,12 @@ struct Queue10 {
         --size;
         return true;
     }
-    string toString() const {
+    std::string toString() const {
         if (empty()) return "[]";
-        string s = "[";
+        std::string s = "[";
         for (int i = 0; i < size; ++i) {
             int idx = (head + i) % CAP;
-            s += to_string(data[idx]);
+            s += std::to_string(data[idx]);
             if (i + 1 < size) s += ", ";
         }
         s += "]";
@@ -38,37 +42,39 @@ struct Queue10 {
     }
 };
 
-static bool readLine(ifstream &in, string &line) {
+static inline bool readLine(std::ifstream &in, std::string &line) {
     if (!std::getline(in, line)) return false;
-    auto l = line.find_first_not_of(" \t\r\n");
-    auto r = line.find_last_not_of(" \t\r\n");
-    if (l == string::npos) { line.clear(); return true; }  // ignore blank lines
-    line = line.substr(l, r - l + 1);
+    // trim both ends (ASCII whitespace)
+    size_t l = 0;
+    while (l < line.size() && std::isspace(static_cast<unsigned char>(line[l]))) ++l;
+    size_t r = line.size();
+    while (r > l && std::isspace(static_cast<unsigned char>(line[r - 1]))) --r;
+    line = line.substr(l, r - l);
     return true;
 }
 
 int main() {
-    ios::sync_with_stdio(false);
-    cin.tie(nullptr);
+    std::ios::sync_with_stdio(false);
+    std::cin.tie(nullptr);
 
-    ifstream in("input.txt");
-    if (!in) { cerr << "Missing input.txt in the working directory.\n"; return 1; }
-    ofstream out("output.txt");
-    if (!out) { cerr << "Cannot open output.txt for writing.\n"; return 1; }
+    std::ifstream in("input.txt");
+    if (!in) { std::cerr << "Missing input.txt in the working directory.\n"; return 1; }
+    std::ofstream out("output.txt");
+    if (!out) { std::cerr << "Cannot open output.txt for writing.\n"; return 1; }
 
     Queue10 q;
-    string line;
+    std::string line;
     while (readLine(in, line)) {
         if (line.empty()) continue;
 
         if (line == "Add" || line == "add" || line == "ADD") {
-            string next;
+            std::string next;
             if (!readLine(in, next)) break;
             out << "Add requested.\n";
             try {
                 size_t pos = 0;
-                long long val_ll = stoll(next, &pos);
-                if (pos != next.size()) throw invalid_argument("trailing");
+                long long val_ll = std::stoll(next, &pos);
+                if (pos != next.size()) throw std::invalid_argument("trailing");
                 int val = static_cast<int>(val_ll);
                 if (q.full()) {
                     out << "Queue is full. Cannot add: " << val << "\n";
